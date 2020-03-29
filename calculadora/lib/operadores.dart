@@ -1,0 +1,1 @@
+enum Operador { SOMAR, DIVIDIR, MULTIPLICAR, SUBTRAIR }
