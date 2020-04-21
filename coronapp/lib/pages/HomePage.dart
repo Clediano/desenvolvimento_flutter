@@ -1,6 +1,14 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:coronapp/models/user.dart';
 
 class HomePage extends StatefulWidget {
+  final User user;
+
+  HomePage({Key key, this.user}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -8,13 +16,36 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _indexTab = 0;
 
+  List newsData;
+
+  @override
+  void initState() {
+    super.initState();
+    this.getData();
+  }
+
+  Future<String> getData() async {
+    var response = await http.get(
+      Uri.encodeFull("http://www.mocky.io/v2/5e9e2d0034000060b56eebf6"),
+      headers: {"Accept": "application/json"},
+    );
+    this.setState(() {
+      newsData = jsonDecode(response.body);
+    });
+    return "OK";
+  }
+
   Widget _getBody() {
     switch (_indexTab) {
       case 0:
-        return Container(
-          height: 200,
-          color: Theme.of(context).primaryColor,
-        );
+        return ListView.builder(
+            itemCount: newsData == null ? 0 : newsData.length,
+            itemBuilder: (BuildContext context, int index) {
+              var data = newsData[index];
+              return Card(
+                child: Text("${data["title"]} - ${data["body"]}"),
+              );
+            });
         break;
       case 1:
         return Container(
@@ -43,10 +74,10 @@ class _HomePageState extends State<HomePage> {
             UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage('assets/images/bitmoji.png'),
+                backgroundImage: MemoryImage(base64.decode(widget.user.photo)),
               ),
-              accountName: Text('CoronaApp'),
-              accountEmail: Text('coronapp@mail.com'),
+              accountName: Text(widget.user.name.toUpperCase()),
+              accountEmail: Text(widget.user.email),
             ),
             ListTile(
               leading: Icon(Icons.add_circle_outline),

@@ -1,4 +1,8 @@
+import 'package:coronapp/pages/RegisterPage.dart';
+import 'package:coronapp/pages/HomePage.dart';
 import 'package:flutter/material.dart';
+import 'package:coronapp/helpers/database_helper.dart';
+import 'package:coronapp/models/user.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,16 +16,26 @@ class _LoginPageState extends State<LoginPage> {
   String _senha = "";
 
   final frmLoginKey = new GlobalKey<FormState>(); //identificador do formulário
+  var db = DatabaseHelper();
 
-  _validarLogin() {
+  _validarLogin() async {
     //capturando o estado atual do formulário
     final form = frmLoginKey.currentState;
 
     if (form.validate()) {
       form.save();
-      //validando formulário e senha
-      if (_usuario == 'coronapp' && _senha == 'coronapp') {
-        Navigator.of(context).pushReplacementNamed('/HomePage');
+
+      User user = await db.validateLogin(_usuario, _senha);
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              user: user,
+            ),
+          ),
+        );
       } else {
         showDialog(
           context: context,
@@ -106,18 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text('Registre-se'),
                       onPressed: () => showDialog(
                         context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text('Atenção'),
-                            content:
-                                Text('Acessou a tela de criação de usuário'),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                          );
-                        },
+                        builder: (context) => RegisterForm(),
                       ),
                     )
                   ],
