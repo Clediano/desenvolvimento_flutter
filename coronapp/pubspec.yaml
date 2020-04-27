@@ -29,6 +29,7 @@ dependencies:
   sqflite:
   image_picker:
   http:
+  intl:
 
 dev_dependencies:
   flutter_test:

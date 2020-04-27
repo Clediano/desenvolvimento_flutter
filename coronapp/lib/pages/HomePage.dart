@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:coronapp/models/news.dart';
+import 'package:coronapp/utils/date_utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -6,6 +8,9 @@ import 'package:coronapp/models/user.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
+  static final from = DateUtils.dateToString(DateTime.now());
+  static final to = DateUtils.dateToString(DateTime.now());
+  String newsUrl = 'http://newsapi.org/v2/everything?q=coronavirus&language=pt&from=$from&to=$to&apiKey=96151502a3d2498399c93fcca45593c4';
 
   HomePage({Key key, this.user}) : super(key: key);
 
@@ -16,7 +21,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _indexTab = 0;
 
-  List newsData;
+  var newsData;
+  List articles;
+  List<News> news;
 
   @override
   void initState() {
@@ -26,11 +33,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> getData() async {
     var response = await http.get(
-      Uri.encodeFull("http://www.mocky.io/v2/5e9e2d0034000060b56eebf6"),
+      Uri.encodeFull(widget.newsUrl),
       headers: {"Accept": "application/json"},
     );
     this.setState(() {
       newsData = jsonDecode(response.body);
+      articles = newsData["articles"] as List;
+      news = articles.map<News>((json) => News.fromJson(json)).toList();
     });
     return "OK";
   }
@@ -39,11 +48,10 @@ class _HomePageState extends State<HomePage> {
     switch (_indexTab) {
       case 0:
         return ListView.builder(
-            itemCount: newsData == null ? 0 : newsData.length,
+            itemCount: news == null ? 0 : news.length,
             itemBuilder: (BuildContext context, int index) {
-              var data = newsData[index];
               return Card(
-                child: Text("${data["title"]} - ${data["body"]}"),
+                child: Text('${news[index].title}'),
               );
             });
         break;
