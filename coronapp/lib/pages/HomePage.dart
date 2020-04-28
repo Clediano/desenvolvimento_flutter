@@ -10,7 +10,8 @@ class HomePage extends StatefulWidget {
   final User user;
   static final from = DateUtils.dateToString(DateTime.now());
   static final to = DateUtils.dateToString(DateTime.now());
-  String newsUrl = 'http://newsapi.org/v2/everything?q=coronavirus&language=pt&from=$from&to=$to&apiKey=96151502a3d2498399c93fcca45593c4';
+  String newsUrl =
+      'http://newsapi.org/v2/everything?q=coronavirus&language=pt&from=$from&to=$to&apiKey=96151502a3d2498399c93fcca45593c4';
 
   HomePage({Key key, this.user}) : super(key: key);
 
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   var newsData;
   List articles;
   List<News> news;
+  var refreshNews = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<String> getData() async {
+    refreshNews.currentState.show();
     var response = await http.get(
       Uri.encodeFull(widget.newsUrl),
       headers: {"Accept": "application/json"},
@@ -47,13 +50,17 @@ class _HomePageState extends State<HomePage> {
   Widget _getBody() {
     switch (_indexTab) {
       case 0:
-        return ListView.builder(
-            itemCount: news == null ? 0 : news.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                child: Text('${news[index].title}'),
-              );
-            });
+        return RefreshIndicator(
+          key: refreshNews,
+          child: ListView.builder(
+              itemCount: news == null ? 0 : news.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: Text('${news[index].title}'),
+                );
+              }),
+          onRefresh: getData,
+        );
         break;
       case 1:
         return Container(
