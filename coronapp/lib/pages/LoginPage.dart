@@ -9,14 +9,26 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   TextStyle style = TextStyle(fontSize: 20);
-
+  AnimationController _controller;
+  final Tween<double> turnsTween = Tween<double>(begin: 1, end: 5);
   String _usuario = "";
   String _senha = "";
 
   final frmLoginKey = new GlobalKey<FormState>(); //identificador do formulário
   var db = DatabaseHelper();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 3),
+    );
+  }
 
   _validarLogin() async {
     //capturando o estado atual do formulário
@@ -37,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       } else {
+        _controller.forward();
         showDialog(
           context: context,
           builder: (context) {
@@ -44,7 +57,8 @@ class _LoginPageState extends State<LoginPage> {
               title: Text('Opss! Algo deu errado.'),
               content: Text('Usuário ou senha inválidos'),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
             );
           },
         );
@@ -96,9 +110,12 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset(
-                      'assets/images/splash.png',
-                      height: 150,
+                    RotationTransition(
+                      child: Image.asset(
+                        'assets/images/splash.png',
+                        height: 150,
+                      ),
+                      turns: turnsTween.animate(_controller),
                     ),
                     SizedBox(height: 35),
                     usuarioField,

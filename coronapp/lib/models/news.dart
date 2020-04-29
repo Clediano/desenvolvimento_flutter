@@ -6,6 +6,7 @@ class News {
   String _imageUrl;
   String _publishedAt;
 
+  Source get source => _source;
   String get author => _author;
   String get title => _title;
   String get content => _content;
@@ -36,6 +37,8 @@ class News {
 class Source {
   String _id;
   String _name;
+
+  String get name => _name;
 
   Source(this._id, this._name);
 

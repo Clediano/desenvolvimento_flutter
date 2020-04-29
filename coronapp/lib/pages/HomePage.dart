@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:coronapp/models/news.dart';
 import 'package:coronapp/utils/date_utils.dart';
+import 'package:coronapp/widgets/NewsItem.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -35,15 +36,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> getData() async {
     refreshNews.currentState.show();
+
     var response = await http.get(
       Uri.encodeFull(widget.newsUrl),
       headers: {"Accept": "application/json"},
     );
+
     this.setState(() {
       newsData = jsonDecode(response.body);
       articles = newsData["articles"] as List;
       news = articles.map<News>((json) => News.fromJson(json)).toList();
     });
+    
     return "OK";
   }
 
@@ -55,9 +59,7 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
               itemCount: news == null ? 0 : news.length,
               itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: Text('${news[index].title}'),
-                );
+                return NewsItem(news[index]);
               }),
           onRefresh: getData,
         );
