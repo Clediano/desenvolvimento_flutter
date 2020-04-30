@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:coronapp/models/user.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -47,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       articles = newsData["articles"] as List;
       news = articles.map<News>((json) => News.fromJson(json)).toList();
     });
-    
+
     return "OK";
   }
 
@@ -59,7 +60,59 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
               itemCount: news == null ? 0 : news.length,
               itemBuilder: (BuildContext context, int index) {
-                return NewsItem(news[index]);
+                //return NewsItem(news[index]);
+                News noticia = news[index];
+                return Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      ListTile(
+                        leading: CircleAvatar(
+                          child: Image.network(noticia.imageUrl),
+                          backgroundColor: Colors.transparent,
+                          maxRadius: 32,
+                        ),
+                        title: Text(
+                          "Título: ${noticia.title}(${noticia.author})",
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Data da publicação: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(noticia.publishedAt))}",
+                              textAlign: TextAlign.start,
+                            ),
+                            Text(
+                              "Conteúdo: ${noticia.content}",
+                              textAlign: TextAlign.start,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: Text(
+                              "Fonte: ${noticia.source.name}",
+                              textAlign: TextAlign.start,
+                              softWrap: true,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  ),
+                );
               }),
           onRefresh: getData,
         );
@@ -83,7 +136,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Text"),
+        title: Text("Notícias do dia"),
       ),
       drawer: Drawer(
         child: ListView(
