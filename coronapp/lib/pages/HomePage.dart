@@ -61,58 +61,8 @@ class _HomePageState extends State<HomePage> {
               itemCount: news == null ? 0 : news.length,
               itemBuilder: (BuildContext context, int index) {
                 //return NewsItem(news[index]);
-                News noticia = news[index];
-                return Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      ListTile(
-                        leading: CircleAvatar(
-                          child: Image.network(noticia.imageUrl),
-                          backgroundColor: Colors.transparent,
-                          maxRadius: 32,
-                        ),
-                        title: Text(
-                          "Título: ${noticia.title}(${noticia.author})",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Data da publicação: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(noticia.publishedAt))}",
-                              textAlign: TextAlign.start,
-                            ),
-                            Text(
-                              "Conteúdo: ${noticia.content}",
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 4,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            child: Text(
-                              "Fonte: ${noticia.source.name}",
-                              textAlign: TextAlign.start,
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                    ],
-                  ),
-                );
+                News notice = news[index];
+                return NewsItem(notice);
               }),
           onRefresh: getData,
         );

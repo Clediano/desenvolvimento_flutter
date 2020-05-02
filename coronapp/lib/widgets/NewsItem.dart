@@ -9,75 +9,56 @@ class NewsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      margin: EdgeInsets.all(10),
-      child: Row(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Container(
-                height: 100,
-                width: 100,
-                child: Image.network(
-                  news.imageUrl,
-                  height: 100,
-                  width: 100,
-                ),
-                margin: EdgeInsets.all(5),
-              ),
-              Container(
-                width: 110,
-                margin: EdgeInsets.all(5),
-                child: Text(
-                  "Fonte: ${news.source.name}",
-                  textAlign: TextAlign.start,
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            height: 120,
-            width: 270,
+    return Container(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  width: double.infinity,
-                  child: Text(
+                ListTile(
+                  leading: CircleAvatar(
+                    child: Image.network(news.imageUrl == null ? "https://tudoparasuaempresa.com.br/assets/img/!product-image.jpg" : news.imageUrl),
+                    backgroundColor: Colors.transparent,
+                    maxRadius: 32,
+                  ),
+                  title: Text(
                     "Título: ${news.title}(${news.author})",
-                    textAlign: TextAlign.start,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  width: double.infinity,
-                  child: Text(
-                    "Data da publicação: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(news.publishedAt))}",
-                    textAlign: TextAlign.start,
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Data da publicação: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(news.publishedAt))}",
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        "Conteúdo: ${news.content}",
+                        textAlign: TextAlign.start,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 4,
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                  width: double.infinity,
-                  child: Text(
-                    "Conteúdo: ${news.content}",
-                    textAlign: TextAlign.start,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 4,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      child: Text(
+                        "Fonte: ${news.source.name}",
+                        textAlign: TextAlign.start,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                Divider(),
               ],
             ),
-          )
-        ],
-      ),
-    );
+          );
   }
 }
