@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'package:coronapp/models/news.dart';
 import 'package:coronapp/utils/date_utils.dart';
 import 'package:coronapp/widgets/NewsItem.dart';
+import 'package:coronapp/widgets/imagecheckbox.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:coronapp/models/user.dart';
-import 'package:intl/intl.dart';
+import 'package:coronapp/models/symptom.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -27,6 +28,9 @@ class _HomePageState extends State<HomePage> {
   var newsData;
   List articles;
   List<News> news;
+  bool _check = false;
+  List<Symptom> symptoms;
+  Map<Symptom, bool> selectedSymptoms = new Map();
   var refreshNews = GlobalKey<RefreshIndicatorState>();
 
   @override
@@ -43,13 +47,25 @@ class _HomePageState extends State<HomePage> {
       headers: {"Accept": "application/json"},
     );
 
+    var symptomsAsset = await DefaultAssetBundle.of(context)
+        .loadString("assets/data/symptoms.json");
+    var symptomsList = json.decode(symptomsAsset) as List;
+
     this.setState(() {
       newsData = jsonDecode(response.body);
       articles = newsData["articles"] as List;
       news = articles.map<News>((json) => News.fromJson(json)).toList();
+      symptoms =
+          symptomsList.map<Symptom>((json) => Symptom.fromJson(json)).toList();
     });
 
     return "OK";
+  }
+
+  void onSelectedSymptom(String description, bool value) {
+    int index = symptoms.indexWhere((sym) => sym.name == description);
+    selectedSymptoms.update(symptoms[index], (vlr) => value,
+        ifAbsent: () => value);
   }
 
   Widget _getBody() {
@@ -60,7 +76,6 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
               itemCount: news == null ? 0 : news.length,
               itemBuilder: (BuildContext context, int index) {
-                //return NewsItem(news[index]);
                 News notice = news[index];
                 return NewsItem(notice);
               }),
@@ -68,9 +83,63 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 1:
-        return Container(
-          height: 200,
-          color: Theme.of(context).accentColor,
+        return Column(
+          children: <Widget>[
+            Text(
+              "Marque o que você está sentindo",
+              style: TextStyle(fontSize: 20),
+            ),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: symptoms == null ? 0 : symptoms.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ImageCheckBox(
+                      value: _check,
+                      onChanged: (bool val) {
+                        setState(() {
+                          _check = val;
+                        });
+                      },
+                      onSelectedSymptom: onSelectedSymptom,
+                      checkDescription: "${symptoms[index].name}",
+                    );
+                  }),
+            ),
+            RaisedButton(
+              onPressed: () {
+                int result = 0;
+                String descricao = "";
+
+                for (var item in selectedSymptoms.entries) {
+                  if(item.value) {
+                    result+=item.key.weight;
+                  }
+                }
+
+                if(result < 30) {
+                  descricao = "Pouca chance de ter corona!";
+                } else if(result < 60) {
+                  descricao = "Chance média de ter corona!";
+                } else {
+                  descricao = "Grande chance de ter corona!";
+                }
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('RESULTADO DO TESTE'),
+                      content: Text(descricao),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Text("Testar"),
+            )
+          ],
         );
         break;
       case 2:
@@ -79,6 +148,8 @@ class _HomePageState extends State<HomePage> {
           color: Colors.green,
         );
         break;
+      default:
+        return null;
     }
   }
 
@@ -134,7 +205,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
             title: Text(
-              'Diagnóstico',
+              'Notícias',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -144,7 +215,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
             title: Text(
-              'Diagnóstico',
+              'Teste Rápido',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -154,7 +225,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
             title: Text(
-              'Diagnóstico',
+              'Sobre',
               style: TextStyle(color: Colors.white),
             ),
           ),
