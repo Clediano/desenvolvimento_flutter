@@ -3,6 +3,7 @@ import 'package:coronapp/pages/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:coronapp/helpers/database_helper.dart';
 import 'package:coronapp/models/user.dart';
+import 'package:internationalization/internationalization.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _LoginPageState extends State<LoginPage>
       },
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: 'Usuário',
+        hintText: Strings.of(context).valueOf("wg_login"),
       ),
     );
     final senhaField = TextFormField(
@@ -88,12 +89,12 @@ class _LoginPageState extends State<LoginPage>
       onSaved: (valor) => _senha = valor,
       validator: (valor) {
         return valor.length < 6
-            ? "Senha deve haver pelo menos 6 caracteres"
+            ? Strings.of(context).valueOf("msg_password")
             : null;
       },
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: 'Senha',
+        hintText: Strings.of(context).valueOf("wg_password"),
       ),
     );
     return Scaffold(
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage>
                     ),
                     SizedBox(height: 35),
                     FlatButton(
-                      child: Text('Registre-se'),
+                      child: Text(Strings.of(context).valueOf("wg_register")),
                       onPressed: () => showDialog(
                         context: context,
                         builder: (context) => RegisterForm(),

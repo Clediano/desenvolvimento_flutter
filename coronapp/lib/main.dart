@@ -2,8 +2,17 @@ import 'package:coronapp/pages/HomePage.dart';
 import 'package:coronapp/pages/LoginPage.dart';
 import 'package:coronapp/pages/SplashPage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:internationalization/internationalization.dart';
 
-void main() => runApp(CoronApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Internationalization.loadConfigurations();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    runApp(CoronApp());
+  });
+}
 
 class CoronApp extends StatelessWidget {
   @override
@@ -19,6 +28,12 @@ class CoronApp extends StatelessWidget {
         '/HomePage': (BuildContext context) => HomePage(),
         '/SplashPage': (BuildContext context) => SplashPage()
       },
+      supportedLocales: suportedLocales,
+      localizationsDelegates: [
+        Internationalization.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
     );
   }
 }

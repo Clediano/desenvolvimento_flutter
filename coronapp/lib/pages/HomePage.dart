@@ -3,7 +3,10 @@ import 'package:coronapp/models/news.dart';
 import 'package:coronapp/utils/date_utils.dart';
 import 'package:coronapp/widgets/NewsItem.dart';
 import 'package:coronapp/widgets/imagecheckbox.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+
+import 'dart:io' show Platform, exit;
 
 import 'package:flutter/material.dart';
 import 'package:coronapp/models/user.dart';
@@ -36,11 +39,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    this.getData();
+    Future.delayed(Duration(microseconds: 100)).then((_) {
+      this.getData();
+    });
   }
 
   Future<String> getData() async {
-    refreshNews.currentState.show();
+    refreshNews.currentState?.show(atTop: false);
 
     var response = await http.get(
       Uri.encodeFull(widget.newsUrl),
@@ -111,14 +116,14 @@ class _HomePageState extends State<HomePage> {
                 String descricao = "";
 
                 for (var item in selectedSymptoms.entries) {
-                  if(item.value) {
-                    result+=item.key.weight;
+                  if (item.value) {
+                    result += item.key.weight;
                   }
                 }
 
-                if(result < 30) {
+                if (result < 30) {
                   descricao = "Pouca chance de ter corona!";
-                } else if(result < 60) {
+                } else if (result < 60) {
                   descricao = "Chance média de ter corona!";
                 } else {
                   descricao = "Grande chance de ter corona!";
@@ -155,6 +160,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var bytes;
+    if (widget.user.photo != null) {
+      bytes = base64.decode(widget.user.photo);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Notícias do dia"),
@@ -165,14 +175,16 @@ class _HomePageState extends State<HomePage> {
             UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
                 radius: 30,
-                backgroundImage: MemoryImage(base64.decode(widget.user.photo)),
+                backgroundImage: bytes != null
+                    ? MemoryImage(bytes)
+                    : AssetImage('assets/images/default.png'),
               ),
               accountName: Text(widget.user.name.toUpperCase()),
               accountEmail: Text(widget.user.email),
             ),
             ListTile(
-              leading: Icon(Icons.add_circle_outline),
-              title: Text('Item de menu 1'),
+              leading: Icon(Icons.settings),
+              title: Text('Configuração'),
               subtitle: Text('Subtítulo 1'),
               trailing: Icon(Icons.arrow_forward),
               onTap: () {
@@ -180,12 +192,13 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text('Item de menu 1'),
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Sair'),
               subtitle: Text('Subtítulo 1'),
               trailing: Icon(Icons.arrow_forward),
               onTap: () {
-                debugPrint('Clicou no menu 2');
+                SystemNavigator.pop();
+                if(Platform.isAndroid) exit(0);
               },
             ),
           ],
